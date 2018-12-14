@@ -14,13 +14,13 @@
         <result column="truck" property="Truck" />
         <result column="pick_worker" property="PickWorker" />
         <result column="lister" property="Lister" />
-        <result column="drive_workers" property="DriveWorkers" typeHandler="cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.HashSetTypeHandler" />
-        <result column="lift_workers" property="LiftWorkers" typeHandler="cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.HashSetTypeHandler" />
+        <result column="drive_workers" property="DriveWorkers" typeHandler="cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler" />
+        <result column="lift_workers" property="LiftWorkers" typeHandler="cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler" />
         <result column="account_status" property="AccountStatus" typeHandler="cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.AccountStatusHandler" />
         <result column="total_amount" property="TotalAmount" />
         <result column="total_volume" property="TotalVolume" />
         <result column="total_weight" property="TotalWeight" />
-        <result column="products" property="Products" typeHandler="cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.HashSetTypeHandler" />
+        <result column="products" property="Products" typeHandler="cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler" />
         <result column="real_outstorage_weight" property="RealOutStorageWeight" />
         <result column="drive_worker_average_weight" property="DriveWorkerAverageWeight" />
         <result column="lift_worker_average_weight" property="LiftWorkerAverageWeight" />
@@ -48,8 +48,8 @@
 			truck = #{Truck},
             pick_worker = #{PickWorker},
             lister = #{Lister},
-            drive_workers = #{DriveWorkers,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.HashSetTypeHandler},
-            lift_workers = #{LiftWorkers,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.HashSetTypeHandler},
+            drive_workers = #{DriveWorkers,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler},
+            lift_workers = #{LiftWorkers,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler},
             account_status = #{AccountStatus,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.AccountStatusHandler},
             total_amount = #{TotalAmount},
             total_volume = #{TotalVolume},
@@ -110,14 +110,14 @@
             <trim prefix="drive_workers =case" suffix="end,">
                 <foreach collection="list" item="item">
                     <if test="item.DriveWorkers!=null">
-                        when id=#{item.Id} then #{item.DriveWorkers,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.HashSetTypeHandler}
+                        when id=#{item.Id} then #{item.DriveWorkers,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler}
                     </if>
                 </foreach>
             </trim>
             <trim prefix="lift_workers =case" suffix="end,">
                 <foreach collection="list" item="item">
                     <if test="item.LiftWorkers!=null">
-                        when id=#{item.Id} then #{item.LiftWorkers,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.HashSetTypeHandler}
+                        when id=#{item.Id} then #{item.LiftWorkers,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler}
                     </if>
                 </foreach>
             </trim>
