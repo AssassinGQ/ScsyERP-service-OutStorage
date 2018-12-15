@@ -7,6 +7,7 @@
 
 	<dubbo:reference timeout="3000" interface="cn.AssassinG.ScsyERP.BasicInfo.facade.service.DriveWorkerServiceFacade" id="driveWorkerServiceFacade" check="false"/>
 	<dubbo:reference timeout="3000" interface="cn.AssassinG.ScsyERP.BasicInfo.facade.service.LiftWorkerServiceFacade" id="liftWorkerServiceFacade" check="false"/>
+	<dubbo:reference timeout="3000" interface="cn.AssassinG.ScsyERP.BasicInfo.facade.service.WarehouseServiceFacade" id="warehouseServiceFacade" check="false"/>
 	<dubbo:reference timeout="3000" interface="cn.AssassinG.ScsyERP.BasicInfo.facade.service.ProductServiceFacade" id="productServiceFacade" check="false"/>
 	<dubbo:reference timeout="3000" interface="cn.AssassinG.ScsyERP.Fee.facade.service.OnTruckFormServiceFacade" id="onTruckFormServiceFacade" check="false"/>
 	<dubbo:reference timeout="3000" interface="cn.AssassinG.ScsyERP.Fee.facade.service.TransportContractServiceFacade" id="transportContractServiceFacade" check="false"/>
