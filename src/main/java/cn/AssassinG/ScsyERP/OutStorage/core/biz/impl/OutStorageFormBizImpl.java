@@ -3,9 +3,11 @@ package cn.AssassinG.ScsyERP.OutStorage.core.biz.impl;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.DriveWorker;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.LiftWorker;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.Product;
+import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.Warehouse;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.service.DriveWorkerServiceFacade;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.service.LiftWorkerServiceFacade;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.service.ProductServiceFacade;
+import cn.AssassinG.ScsyERP.BasicInfo.facade.service.WarehouseServiceFacade;
 import cn.AssassinG.ScsyERP.Fee.facade.entity.OnTruckForm;
 import cn.AssassinG.ScsyERP.Fee.facade.entity.TransportContract;
 import cn.AssassinG.ScsyERP.Fee.facade.service.OnTruckFormServiceFacade;
@@ -273,6 +275,8 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
     private OnTruckFormServiceFacade onTruckFormServiceFacade;
     @Autowired
     private TransportContractServiceFacade transportContractServiceFacade;
+    @Autowired
+    private WarehouseServiceFacade warehouseServiceFacade;
 
     @Override
     @Transactional
@@ -284,6 +288,7 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         if(outStorageForm == null || outStorageForm.getIfDeleted()){
             throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
         }
+        //总计
         Set<Long> products = outStorageForm.getProducts();
         Iterator<Long> iterator = products.iterator();
         int totalAmount = 0;
@@ -302,9 +307,23 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         outStorageForm.setTotalAmount(totalAmount);
         outStorageForm.setTotalVolume(totalVolume);
         outStorageForm.setTotalWeight(totalWeight);
-        outStorageForm.setDriveWorkerAverageWeight(totalWeight/((double)outStorageForm.getDriveWorkers().size()));
-        outStorageForm.setLiftWorkerAverageWeight(totalWeight/((double)outStorageForm.getLiftWorkers().size()));
+        //平均重量
+        Warehouse warehouse = warehouseServiceFacade.getById(outStorageForm.getWarehouse());
+        if(warehouse != null){
+            if(warehouse.getDriveWorkers() == null || warehouse.getDriveWorkers().size() == 0)
+                outStorageForm.setDriveWorkerAverageWeight(0.0);
+            else
+                outStorageForm.setDriveWorkerAverageWeight(totalWeight/((double)warehouse.getDriveWorkers().size()));
+            if(warehouse.getLiftWorkers() == null || warehouse.getLiftWorkers().size() == 0)
+                outStorageForm.setLiftWorkerAverageWeight(0.0);
+            else
+                outStorageForm.setLiftWorkerAverageWeight(totalWeight/((double)warehouse.getLiftWorkers().size()));
+        }else{
+            outStorageForm.setDriveWorkerAverageWeight(0.0);
+            outStorageForm.setLiftWorkerAverageWeight(0.0);
+        }
         this.update(outStorageForm);
+        //生成对应的随车清单和运输合同
         OnTruckForm onTruckForm = new OnTruckForm();
         onTruckForm.setFormNumber("OTF"+outStorageForm.getId());
         onTruckForm.setProject(outStorageForm.getProject());
