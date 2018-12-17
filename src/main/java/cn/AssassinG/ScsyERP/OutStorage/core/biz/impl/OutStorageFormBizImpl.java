@@ -325,11 +325,13 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         this.update(outStorageForm);
         //生成对应的随车清单和运输合同
         OnTruckForm onTruckForm = new OnTruckForm();
+        onTruckForm.setCorporation(outStorageForm.getCorporation());
         onTruckForm.setFormNumber("OTF"+outStorageForm.getId());
         onTruckForm.setProject(outStorageForm.getProject());
         onTruckForm.setOutStorageForm(outStorageForm.getId());
         onTruckFormServiceFacade.create(onTruckForm);
         TransportContract transportContract = new TransportContract();
+        transportContract.setCorporation(outStorageForm.getCorporation());
         transportContract.setContractNumber("TC"+outStorageForm.getId());
         transportContract.setOnTruckForm(onTruckForm.getId());
         transportContract.setProject(outStorageForm.getProject());
