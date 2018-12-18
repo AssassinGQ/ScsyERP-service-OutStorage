@@ -4,6 +4,7 @@ import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.DriveWorker;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.LiftWorker;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.Product;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.Warehouse;
+import cn.AssassinG.ScsyERP.BasicInfo.facade.enums.ProductStatus;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.service.DriveWorkerServiceFacade;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.service.LiftWorkerServiceFacade;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.service.ProductServiceFacade;
@@ -247,6 +248,12 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         if(product == null || product.getIfDeleted()){
             throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的货物基本信息，entityId: %d", entityId);
         }
+        if(product.getStatus().getValue() == ProductStatus.DRK.getValue()){
+            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "该货物尚未入库，entityId: %d", product.getId());
+        }
+        if(product.getStatus().getValue() == ProductStatus.YCK.getValue()){
+            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "该货物已经出库，entityId: %d", product.getId());
+        }
         outStorageForm.getProducts().add(product.getId());
         this.update(outStorageForm);
     }
@@ -267,6 +274,14 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         if(product == null || product.getIfDeleted()){
             throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的货物基本信息，entityId: %d", entityId);
         }
+        if(product.getStatus().getValue() == ProductStatus.DRK.getValue()){
+            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "该货物尚未入库，entityId: %d", product.getId());
+        }
+        if(product.getStatus().getValue() == ProductStatus.YRK.getValue()){
+            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "该货物尚未出库，entityId: %d", product.getId());
+        }
+        product.setStatus(ProductStatus.YRK);
+        product.setOutStorageForm(null);
         outStorageForm.getProducts().remove(product.getId());
         this.update(outStorageForm);
     }
