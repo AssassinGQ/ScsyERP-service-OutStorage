@@ -256,6 +256,7 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         }
         outStorageForm.getProducts().add(product.getId());
         this.update(outStorageForm);
+        productServiceFacade.update(product);
     }
 
     @Transactional
@@ -284,6 +285,7 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         product.setOutStorageForm(null);
         outStorageForm.getProducts().remove(product.getId());
         this.update(outStorageForm);
+        productServiceFacade.update(product);
     }
 
     @Autowired
