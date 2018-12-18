@@ -294,7 +294,6 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
     private WarehouseServiceFacade warehouseServiceFacade;
 
     @Override
-    @Transactional
     public void complete(Long entityId) {
         if(entityId == null){
             throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "出库单基本信息主键不能为空");
