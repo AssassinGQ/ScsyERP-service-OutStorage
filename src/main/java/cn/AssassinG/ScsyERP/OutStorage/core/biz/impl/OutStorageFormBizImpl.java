@@ -16,18 +16,18 @@ import cn.AssassinG.ScsyERP.Fee.facade.service.TransportContractServiceFacade;
 import cn.AssassinG.ScsyERP.OutStorage.core.biz.OutStorageFormBiz;
 import cn.AssassinG.ScsyERP.OutStorage.core.dao.OutStorageFormDao;
 import cn.AssassinG.ScsyERP.OutStorage.facade.entity.OutStorageForm;
+import cn.AssassinG.ScsyERP.OutStorage.facade.enums.OutStorageFormStatus;
 import cn.AssassinG.ScsyERP.OutStorage.facade.exceptions.OutStorageFormBizException;
 import cn.AssassinG.ScsyERP.common.core.biz.impl.FormBizImpl;
 import cn.AssassinG.ScsyERP.common.core.dao.BaseDao;
 import cn.AssassinG.ScsyERP.common.enums.AccountStatus;
+import cn.AssassinG.ScsyERP.common.utils.ValidUtils;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component("OutStorageFormBiz")
 public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implements OutStorageFormBiz {
@@ -48,6 +48,35 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
 //        }
 //        getDao().update(outStorageForm);
 //    }
+
+    @Override
+    public Long create(OutStorageForm outStorageForm) {
+        if(outStorageForm.getOutStorageNumber() == null){
+            outStorageForm.setOutStorageNumber(String.valueOf(System.currentTimeMillis()));
+        }
+        if(outStorageForm.getAccountStatus() == null) {
+            outStorageForm.setAccountStatus(cn.AssassinG.ScsyERP.common.enums.AccountStatus.WRZ);
+        }
+        outStorageForm.setOutStorageStatus(OutStorageFormStatus.Workging);
+        outStorageForm.setOutStorageTime(new Date());
+        ValidUtils.ValidationWithExp(outStorageForm);
+//        Map<String, Object> queryMap = new HashMap<String, Object>();
+//        queryMap.put("IfDeleted", false);
+//        queryMap.put("Warehouse", outStorageForm.getWarehouse());
+//        queryMap.put("IfCompleted", false);
+//        List<InStorageForm> inStorageForms = inStorageFormDao.listBy(queryMap);
+//        if(inStorageForms.size() > 1){
+//            throw new InStorageFormBizException(InStorageFormBizException.INSTORAGEFORMBIZ_UNKNOWN_ERROR, "仓库（主键：%d）存在多个活跃的入库单", outStorageForm.getWarehouse());
+//        }else if(inStorageForms.size() == 1){
+//            throw new InStorageFormBizException(InStorageFormBizException.INSTORAGEFORMBIZ_UNKNOWN_ERROR, "当前仓库已经存在一个活跃的入库单，仓库主键：%d", inStorageForms.get(0).getWarehouse());
+//        }else{
+            Long id = getDao().insert(outStorageForm);
+            if(!outStorageForm.getOutStorageNumber().startsWith("ckd")){
+                outStorageForm.setOutStorageNumber("ckd" + id);
+            }
+            return id;
+//        }
+    }
 
     /**
      * @param entityId
@@ -117,117 +146,117 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         }
     }
 
-    @Autowired
-    private DriveWorkerServiceFacade driveWorkerServiceFacade;
-
-    @Transactional
-    public void addDriveWorkers(Long entityId, String jsonArrayStr) {
-        if(entityId == null){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "出库单基本信息主键不能为空");
-        }
-        if(jsonArrayStr == null || jsonArrayStr.isEmpty()){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "行车工基本信息主键不能为空");
-        }
-        JSONArray jsonArray;
-        try{
-            jsonArray = JSONArray.parseArray(jsonArrayStr);
-        }catch(Exception e){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "行车工基本信息主键格式不正确");
-        }
-        OutStorageForm outStorageForm = this.getById(entityId);
-        if(outStorageForm == null || outStorageForm.getIfDeleted()){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
-        }
-        boolean flag = true;
-        for(int i = 0; i < jsonArray.size(); i++){
-            DriveWorker driveWorker_tmp = driveWorkerServiceFacade.getById(jsonArray.getLong(i));
-            if(driveWorker_tmp == null || driveWorker_tmp.getIfDeleted()){
-                flag = false;
-            }else{
-                outStorageForm.getDriveWorkers().add(driveWorker_tmp.getId());
-            }
-        }
-        this.update(outStorageForm);
-        if(!flag){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_UNKNOWN_ERROR, "一部分行车工主键没有对应的记录导致这部分主键没有添加到", entityId);
-        }
-    }
-
-    @Transactional
-    public void removeDriveWorker(Long entityId, Long driveWorkerId) {
-        if(entityId == null){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "出库单基本信息主键不能为空");
-        }
-        if(driveWorkerId == null){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "行车工基本信息主键不能为空");
-        }
-        OutStorageForm outStorageForm = this.getById(entityId);
-        if(outStorageForm == null || outStorageForm.getIfDeleted()){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
-        }
-        DriveWorker driveWorker = driveWorkerServiceFacade.getById(driveWorkerId);
-        if(driveWorker == null || driveWorker.getIfDeleted()){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的行车工基本信息，entityId: %d", entityId);
-        }
-        outStorageForm.getDriveWorkers().remove(driveWorker.getId());
-        this.update(outStorageForm);
-    }
-
-    @Autowired
-    private LiftWorkerServiceFacade liftWorkerServiceFacade;
-
-    @Transactional
-    public void addLiftWorkers(Long entityId, String jsonArrayStr) {
-        if(entityId == null){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "出库单基本信息主键不能为空");
-        }
-        if(jsonArrayStr == null || jsonArrayStr.isEmpty()){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "起重工基本信息主键不能为空");
-        }
-        JSONArray jsonArray;
-        try{
-            jsonArray = JSONArray.parseArray(jsonArrayStr);
-        }catch(Exception e){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "起重工基本信息主键格式不正确");
-        }
-        OutStorageForm outStorageForm = this.getById(entityId);
-        if(outStorageForm == null || outStorageForm.getIfDeleted()){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
-        }
-        boolean flag = true;
-        for(int i = 0; i < jsonArray.size(); i++){
-            LiftWorker liftWorker_tmp = liftWorkerServiceFacade.getById(jsonArray.getLong(i));
-            if(liftWorker_tmp == null || liftWorker_tmp.getIfDeleted()){
-                flag = false;
-            }else{
-                outStorageForm.getLiftWorkers().add(liftWorker_tmp.getId());
-            }
-        }
-        this.update(outStorageForm);
-        if(!flag){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_UNKNOWN_ERROR, "一部分起重工主键没有对应的记录导致这部分主键没有添加到", entityId);
-        }
-    }
-
-    @Transactional
-    public void removeLiftWorker(Long entityId, Long liftWorkerId) {
-        if(entityId == null){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "出库单基本信息主键不能为空");
-        }
-        if(liftWorkerId == null){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "起重工基本信息主键不能为空");
-        }
-        OutStorageForm outStorageForm = this.getById(entityId);
-        if(outStorageForm == null || outStorageForm.getIfDeleted()){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
-        }
-        LiftWorker liftWorker = liftWorkerServiceFacade.getById(liftWorkerId);
-        if(liftWorker == null || liftWorker.getIfDeleted()){
-            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的起重工基本信息，entityId: %d", entityId);
-        }
-        outStorageForm.getLiftWorkers().remove(liftWorker.getId());
-        this.update(outStorageForm);
-    }
+//    @Autowired
+//    private DriveWorkerServiceFacade driveWorkerServiceFacade;
+//
+//    @Transactional
+//    public void addDriveWorkers(Long entityId, String jsonArrayStr) {
+//        if(entityId == null){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "出库单基本信息主键不能为空");
+//        }
+//        if(jsonArrayStr == null || jsonArrayStr.isEmpty()){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "行车工基本信息主键不能为空");
+//        }
+//        JSONArray jsonArray;
+//        try{
+//            jsonArray = JSONArray.parseArray(jsonArrayStr);
+//        }catch(Exception e){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "行车工基本信息主键格式不正确");
+//        }
+//        OutStorageForm outStorageForm = this.getById(entityId);
+//        if(outStorageForm == null || outStorageForm.getIfDeleted()){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
+//        }
+//        boolean flag = true;
+//        for(int i = 0; i < jsonArray.size(); i++){
+//            DriveWorker driveWorker_tmp = driveWorkerServiceFacade.getById(jsonArray.getLong(i));
+//            if(driveWorker_tmp == null || driveWorker_tmp.getIfDeleted()){
+//                flag = false;
+//            }else{
+//                outStorageForm.getDriveWorkers().add(driveWorker_tmp.getId());
+//            }
+//        }
+//        this.update(outStorageForm);
+//        if(!flag){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_UNKNOWN_ERROR, "一部分行车工主键没有对应的记录导致这部分主键没有添加到", entityId);
+//        }
+//    }
+//
+//    @Transactional
+//    public void removeDriveWorker(Long entityId, Long driveWorkerId) {
+//        if(entityId == null){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "出库单基本信息主键不能为空");
+//        }
+//        if(driveWorkerId == null){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "行车工基本信息主键不能为空");
+//        }
+//        OutStorageForm outStorageForm = this.getById(entityId);
+//        if(outStorageForm == null || outStorageForm.getIfDeleted()){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
+//        }
+//        DriveWorker driveWorker = driveWorkerServiceFacade.getById(driveWorkerId);
+//        if(driveWorker == null || driveWorker.getIfDeleted()){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的行车工基本信息，entityId: %d", entityId);
+//        }
+//        outStorageForm.getDriveWorkers().remove(driveWorker.getId());
+//        this.update(outStorageForm);
+//    }
+//
+//    @Autowired
+//    private LiftWorkerServiceFacade liftWorkerServiceFacade;
+//
+//    @Transactional
+//    public void addLiftWorkers(Long entityId, String jsonArrayStr) {
+//        if(entityId == null){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "出库单基本信息主键不能为空");
+//        }
+//        if(jsonArrayStr == null || jsonArrayStr.isEmpty()){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "起重工基本信息主键不能为空");
+//        }
+//        JSONArray jsonArray;
+//        try{
+//            jsonArray = JSONArray.parseArray(jsonArrayStr);
+//        }catch(Exception e){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "起重工基本信息主键格式不正确");
+//        }
+//        OutStorageForm outStorageForm = this.getById(entityId);
+//        if(outStorageForm == null || outStorageForm.getIfDeleted()){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
+//        }
+//        boolean flag = true;
+//        for(int i = 0; i < jsonArray.size(); i++){
+//            LiftWorker liftWorker_tmp = liftWorkerServiceFacade.getById(jsonArray.getLong(i));
+//            if(liftWorker_tmp == null || liftWorker_tmp.getIfDeleted()){
+//                flag = false;
+//            }else{
+//                outStorageForm.getLiftWorkers().add(liftWorker_tmp.getId());
+//            }
+//        }
+//        this.update(outStorageForm);
+//        if(!flag){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_UNKNOWN_ERROR, "一部分起重工主键没有对应的记录导致这部分主键没有添加到", entityId);
+//        }
+//    }
+//
+//    @Transactional
+//    public void removeLiftWorker(Long entityId, Long liftWorkerId) {
+//        if(entityId == null){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "出库单基本信息主键不能为空");
+//        }
+//        if(liftWorkerId == null){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_PARAMS_ILLEGAL, "起重工基本信息主键不能为空");
+//        }
+//        OutStorageForm outStorageForm = this.getById(entityId);
+//        if(outStorageForm == null || outStorageForm.getIfDeleted()){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
+//        }
+//        LiftWorker liftWorker = liftWorkerServiceFacade.getById(liftWorkerId);
+//        if(liftWorker == null || liftWorker.getIfDeleted()){
+//            throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的起重工基本信息，entityId: %d", entityId);
+//        }
+//        outStorageForm.getLiftWorkers().remove(liftWorker.getId());
+//        this.update(outStorageForm);
+//    }
 
     @Autowired
     private ProductServiceFacade productServiceFacade;
@@ -254,6 +283,8 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         if(product.getStatus().getValue() == ProductStatus.YCK.getValue()){
             throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "该货物已经出库，entityId: %d", product.getId());
         }
+        product.setOutStorageForm(outStorageForm.getId());
+        product.setStatus(ProductStatus.YCK);
         outStorageForm.getProducts().add(product.getId());
         this.update(outStorageForm);
         productServiceFacade.update(product);
