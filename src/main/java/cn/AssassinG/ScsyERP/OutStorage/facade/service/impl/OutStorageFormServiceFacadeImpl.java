@@ -19,26 +19,6 @@ public class OutStorageFormServiceFacadeImpl extends FormServiceImpl<OutStorageF
     }
 
     @Override
-    public void addDriveWorkers(Long entityId, String jsonArrayStr) {
-        this.outStorageFormBiz.addDriveWorkers(entityId, jsonArrayStr);
-    }
-
-    @Override
-    public void removeDriveWorker(Long entityId, Long driveWorkerId) {
-        this.outStorageFormBiz.removeDriveWorker(entityId, driveWorkerId);
-    }
-
-    @Override
-    public void addLiftWorkers(Long entityId, String jsonArrayStr) {
-        this.outStorageFormBiz.addLiftWorkers(entityId, jsonArrayStr);
-    }
-
-    @Override
-    public void removeLiftWorker(Long entityId, Long liftWorkerId) {
-        this.outStorageFormBiz.removeLiftWorker(entityId, liftWorkerId);
-    }
-
-    @Override
     public void addProduct(Long entityId, Long productId) {
         this.outStorageFormBiz.addProduct(entityId, productId);
     }
