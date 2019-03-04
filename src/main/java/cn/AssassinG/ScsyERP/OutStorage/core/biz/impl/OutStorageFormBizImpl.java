@@ -1,12 +1,8 @@
 package cn.AssassinG.ScsyERP.OutStorage.core.biz.impl;
 
-import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.DriveWorker;
-import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.LiftWorker;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.Product;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.entity.Warehouse;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.enums.ProductStatus;
-import cn.AssassinG.ScsyERP.BasicInfo.facade.service.DriveWorkerServiceFacade;
-import cn.AssassinG.ScsyERP.BasicInfo.facade.service.LiftWorkerServiceFacade;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.service.ProductServiceFacade;
 import cn.AssassinG.ScsyERP.BasicInfo.facade.service.WarehouseServiceFacade;
 import cn.AssassinG.ScsyERP.Fee.facade.entity.OnTruckForm;
@@ -22,12 +18,14 @@ import cn.AssassinG.ScsyERP.common.core.biz.impl.FormBizImpl;
 import cn.AssassinG.ScsyERP.common.core.dao.BaseDao;
 import cn.AssassinG.ScsyERP.common.enums.AccountStatus;
 import cn.AssassinG.ScsyERP.common.utils.ValidUtils;
-import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 @Component("OutStorageFormBiz")
 public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implements OutStorageFormBiz {
@@ -73,6 +71,7 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
             Long id = getDao().insert(outStorageForm);
             if(!outStorageForm.getOutStorageNumber().startsWith("ckd")){
                 outStorageForm.setOutStorageNumber("ckd" + id);
+                getDao().update(outStorageForm);
             }
             return id;
 //        }
