@@ -353,6 +353,8 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         outStorageForm.setTotalAmount(totalAmount);
         outStorageForm.setTotalVolume(totalVolume);
         outStorageForm.setTotalWeight(totalWeight);
+        outStorageForm.setOutStorageStatus(OutStorageFormStatus.Done);
+        outStorageForm.setIfCompleted(true);
         //平均重量
         Warehouse warehouse = warehouseServiceFacade.getById(outStorageForm.getWarehouse());
         if(warehouse != null){
