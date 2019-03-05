@@ -43,7 +43,7 @@
 		update <include refid="t_out_storage_form"/>
 		<set>
 			update_time = now(),
-            outstorage_status = #{OutStorageStatus},
+            outstorage_status = #{OutStorageStatus,typeHandler=cn.AssassinG.ScsyERP.OutStorage.core.dao.MyBatisHandler.OutStorageStatusHandler},
 			warehouse = #{Warehouse},
 			truck = #{Truck},
             pick_worker = #{PickWorker},
@@ -75,7 +75,7 @@
             <trim prefix="outstorage_status =case" suffix="end,">
                 <foreach collection="list" item="item">
                     <if test="item.OutStorageStatus!=null">
-                        when id=#{item.Id} then #{item.OutStorageStatus}
+                        when id=#{item.Id} then #{item.OutStorageStatus,typeHandler=cn.AssassinG.ScsyERP.OutStorage.core.dao.MyBatisHandler.OutStorageStatusHandler}
                     </if>
                 </foreach>
             </trim>
