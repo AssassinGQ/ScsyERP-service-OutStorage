@@ -22,10 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component("OutStorageFormBiz")
 public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implements OutStorageFormBiz {
@@ -57,6 +54,7 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         }
         outStorageForm.setOutStorageStatus(OutStorageFormStatus.Workging);
         outStorageForm.setOutStorageTime(new Date());
+        outStorageForm.setProducts(new HashSet<>());
         ValidUtils.ValidationWithExp(outStorageForm);
 //        Map<String, Object> queryMap = new HashMap<String, Object>();
 //        queryMap.put("IfDeleted", false);
