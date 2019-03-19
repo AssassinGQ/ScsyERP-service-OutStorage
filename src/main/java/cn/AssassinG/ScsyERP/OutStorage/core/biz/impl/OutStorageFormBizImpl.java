@@ -302,7 +302,7 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
             throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的出库单基本信息，entityId: %d", entityId);
         }
         Product product = productServiceFacade.getById(productId);
-        if(product == null || product.getIfDeleted()){
+        if(product == null){
             throw new OutStorageFormBizException(OutStorageFormBizException.OUTSTORAGEFORMBIZ_NOSUIT_RESULT, "没有符合条件的货物基本信息，entityId: %d", entityId);
         }
         if(product.getStatus().getValue() == ProductStatus.DRK.getValue()){
