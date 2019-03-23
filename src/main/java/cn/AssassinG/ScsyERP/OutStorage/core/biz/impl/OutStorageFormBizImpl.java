@@ -55,6 +55,7 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         outStorageForm.setOutStorageStatus(OutStorageFormStatus.Workging);
         outStorageForm.setOutStorageTime(new Date());
         outStorageForm.setProducts(new HashSet<>());
+        outStorageForm.setIfCompleted(false);
         ValidUtils.ValidationWithExp(outStorageForm);
 //        Map<String, Object> queryMap = new HashMap<String, Object>();
 //        queryMap.put("IfDeleted", false);
