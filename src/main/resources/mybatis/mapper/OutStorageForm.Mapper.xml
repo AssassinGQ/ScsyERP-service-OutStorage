@@ -27,15 +27,15 @@
 	</resultMap>
 
 	<insert id="insert" parameterType="OutStorageFormBean" keyProperty="id" useGeneratedKeys="true">
-		insert into <include refid="t_out_storage_form"/> (corporation, create_time, update_time, delete_time, is_deleted, project, outstorage_status, outstorage_number, outstorage_time, warehouse, truck, pick_worker, lister, account_status, total_amount, total_volume, total_weight, real_outstorage_weight, drive_worker_average_weight, lift_worker_average_weight, if_completed)
-		values (#{Corporation}, now(), now(), NULL , FALSE, #{Project}, #{OutStorageStatus,typeHandler=cn.AssassinG.ScsyERP.OutStorage.core.dao.MyBatisHandler.OutStorageStatusHandler}, #{OutStorageNumber}, #{OutStorageTime}, #{Warehouse}, #{Truck}, #{PickWorker}, #{Lister}, #{AccountStatus,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.AccountStatusHandler}, #{TotalAmount}, #{TotalVolume}, #{TotalWeight}, #{RealOutStorageWeight}, #{DriveWorkerAverageWeight}, #{LiftWorkerAverageWeight}, #{IfCompleted})
+		insert into <include refid="t_out_storage_form"/> (corporation, create_time, update_time, delete_time, is_deleted, project, outstorage_status, outstorage_number, outstorage_time, warehouse, truck, pick_worker, lister, account_status, total_amount, total_volume, total_weight, real_outstorage_weight, drive_worker_average_weight, lift_worker_average_weight, if_completed, products)
+		values (#{Corporation}, now(), now(), NULL , FALSE, #{Project}, #{OutStorageStatus,typeHandler=cn.AssassinG.ScsyERP.OutStorage.core.dao.MyBatisHandler.OutStorageStatusHandler}, #{OutStorageNumber}, #{OutStorageTime}, #{Warehouse}, #{Truck}, #{PickWorker}, #{Lister}, #{AccountStatus,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.AccountStatusHandler}, #{TotalAmount}, #{TotalVolume}, #{TotalWeight}, #{RealOutStorageWeight}, #{DriveWorkerAverageWeight}, #{LiftWorkerAverageWeight}, #{IfCompleted}, #{Products,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler})
 	</insert>
 
 	<insert id="batchInsert" parameterType="List" keyProperty="id" useGeneratedKeys="true">
-		insert into <include refid="t_out_storage_form"/> (corporation, create_time, update_time, delete_time, is_deleted, project, outstorage_status, outstorage_number, outstorage_time, warehouse, truck, pick_worker, lister, account_status, total_amount, total_volume, total_weight, real_outstorage_weight, drive_worker_average_weight, lift_worker_average_weight, if_completed)
+		insert into <include refid="t_out_storage_form"/> (corporation, create_time, update_time, delete_time, is_deleted, project, outstorage_status, outstorage_number, outstorage_time, warehouse, truck, pick_worker, lister, account_status, total_amount, total_volume, total_weight, real_outstorage_weight, drive_worker_average_weight, lift_worker_average_weight, if_completed, products)
 		values
         <foreach collection="list" item="obj" separator=",">
-            (#{obj.Corporation}, now(), now(), NULL, FALSE, #{obj.Project}, #{obj.OutStorageStatus,typeHandler=cn.AssassinG.ScsyERP.OutStorage.core.dao.MyBatisHandler.OutStorageStatusHandler}, #{obj.OutStorageNumber}, #{obj.OutStorageTime}, #{obj.Warehouse}, #{obj.Truck}, #{obj.PickWorker}, #{obj.Lister}, #{obj.AccountStatus,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.AccountStatusHandler}, #{obj.TotalAmount}, #{obj.TotalVolume}, #{obj.TotalWeight}, #{obj.RealOutStorageWeight}, #{obj.DriveWorkerAverageWeight}, #{obj.LiftWorkerAverageWeight}, #{obj.IfCompleted})
+            (#{obj.Corporation}, now(), now(), NULL, FALSE, #{obj.Project}, #{obj.OutStorageStatus,typeHandler=cn.AssassinG.ScsyERP.OutStorage.core.dao.MyBatisHandler.OutStorageStatusHandler}, #{obj.OutStorageNumber}, #{obj.OutStorageTime}, #{obj.Warehouse}, #{obj.Truck}, #{obj.PickWorker}, #{obj.Lister}, #{obj.AccountStatus,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.AccountStatusHandler}, #{obj.TotalAmount}, #{obj.TotalVolume}, #{obj.TotalWeight}, #{obj.RealOutStorageWeight}, #{obj.DriveWorkerAverageWeight}, #{obj.LiftWorkerAverageWeight}, #{obj.IfCompleted}, #{obj.Products,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler})
         </foreach>
 	</insert>
 	
@@ -57,7 +57,8 @@
             real_outstorage_weight = #{RealOutStorageWeight},
             drive_worker_average_weight = #{DriveWorkerAverageWeight},
             lift_worker_average_weight = #{LiftWorkerAverageWeight},
-            if_completed = #{IfCompleted}
+            if_completed = #{IfCompleted},
+		    products = #{Products,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler}
 		</set>
 		<where>
 			id = #{Id}
@@ -174,6 +175,13 @@
                 <foreach collection="list" item="item">
                     <if test="item.IfCompleted!=null">
                         when id=#{item.Id} then #{item.IfCompleted}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="products =case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.Products!=null">
+                        when id=#{item.Id} then #{item.Products,typeHandler=cn.AssassinG.ScsyERP.common.core.dao.MyBatisTypeHandler.LongHashSetTypeHandler}
                     </if>
                 </foreach>
             </trim>
