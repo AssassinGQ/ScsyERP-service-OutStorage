@@ -110,15 +110,15 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
                 flag = true;
             }
             if(truck != null) {
-                outStorageForm.setWarehouse(truck);
+                outStorageForm.setTruck(truck);
                 flag = true;
             }
             if(pickWorker != null) {
-                outStorageForm.setWarehouse(pickWorker);
+                outStorageForm.setPickWorker(pickWorker);
                 flag = true;
             }
             if(lister != null) {
-                outStorageForm.setWarehouse(lister);
+                outStorageForm.setLister(lister);
                 flag = true;
             }
             if(accountStatus != null) {
