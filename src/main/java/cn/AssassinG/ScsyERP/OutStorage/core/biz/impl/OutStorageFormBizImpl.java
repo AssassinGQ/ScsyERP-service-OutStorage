@@ -283,7 +283,6 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         }
         product.setOutStorageForm(outStorageForm.getId());
         product.setStatus(ProductStatus.YCK);
-        System.out.println(outStorageForm);
         outStorageForm.getProducts().add(product.getId());
         this.update(outStorageForm);
         productServiceFacade.update(product);
