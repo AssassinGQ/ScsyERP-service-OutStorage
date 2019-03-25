@@ -378,11 +378,11 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
         onTruckForm.setFormNumber("OTF"+outStorageForm.getId());
         onTruckForm.setProject(outStorageForm.getProject());
         onTruckForm.setOutStorageForm(outStorageForm.getId());
-        onTruckFormServiceFacade.create(onTruckForm);
+        long otfid = onTruckFormServiceFacade.create(onTruckForm);
         TransportContract transportContract = new TransportContract();
         transportContract.setCorporation(outStorageForm.getCorporation());
         transportContract.setContractNumber("TC"+outStorageForm.getId());
-        transportContract.setOnTruckForm(onTruckForm.getId());
+        transportContract.setOnTruckForm(otfid);
         transportContract.setProject(outStorageForm.getProject());
         transportContract.setOutStorageForm(outStorageForm.getId());
         transportContract.setTruck(outStorageForm.getTruck());
