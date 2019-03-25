@@ -343,8 +343,10 @@ public class OutStorageFormBizImpl extends FormBizImpl<OutStorageForm> implement
             Product product = productServiceFacade.getById(iterator.next());
             if(product != null || !product.getIfDeleted()){
                 totalAmount++;
-                totalVolume += product.getVolume();
-                totalWeight += product.getWeight();
+                if(product.getVolume() != null)
+                    totalVolume += product.getVolume();
+                if(product.getWeight() != null)
+                    totalWeight += product.getWeight();
             }else{
                 iterator.remove();
             }
