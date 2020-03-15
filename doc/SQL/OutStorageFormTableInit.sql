@@ -34,4 +34,4 @@ create table t_out_storage_form (
 alter table t_out_storage_form comment '入库单信息表';
 
 ## 权限的初始化数据
-insert into t_out_storage_form(corporation, project, outstorage_status, outstorage_number, outstorage_time, warehouse, truck, pick_worker, lister, if_completed, products) values (1, 1, "正在出库", "rkh12345", now(), 1, 1, 1, 1, false, "");
+insert into t_out_storage_form(corporation, project, outstorage_status, outstorage_number, outstorage_time, warehouse, truck, pick_worker, lister, if_completed, products) values (1, 1, "out_storaging", "rkh12345", now(), 1, 1, 1, 1, false, "");
